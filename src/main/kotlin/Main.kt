@@ -1,34 +1,32 @@
 fun main() {
-    var pc = 0
     val register = mutableMapOf(
         Register.R1 to 1,
         Register.R2 to 0,
         Register.R3 to 0,
-        Register.R4 to 0
+        Register.R4 to 0,
+        Register.PC to 0
     )
 
     while (true) {
-        val (command, pointer1, pointer2) = code[pc]
+        val (command, pointer1, pointer2) = code[register[Register.PC] ?: 0]
         val arg1 = register[pointer1] ?: 0
         val arg2 = register[pointer2] ?: 0
         when (command) {
             CommandSet.ADD -> {
                 register[pointer1] = arg1 + arg2
-                pc++
             }
             CommandSet.MV -> {
                 register[pointer1] = arg2
                 register[pointer2] = arg1
-                pc++
             }
             CommandSet.CP -> {
                 register[pointer2] = arg1
-                pc++
             }
             CommandSet.EXIT -> {
                 break
             }
         }
+        register[Register.PC] = register[Register.PC]!! + 1
     }
     println(register)
 }
@@ -50,5 +48,5 @@ enum class CommandSet {
 }
 
 enum class Register {
-    R1, R2, R3, R4
+    R1, R2, R3, R4, PC
 }
