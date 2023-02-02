@@ -1,3 +1,5 @@
+import kotlin.experimental.and
+
 class Cpu(private val memory: Memory){
     private var registerA: Byte = 0x00
     private var registerB: Byte = 0x00
@@ -71,6 +73,58 @@ class Cpu(private val memory: Memory){
     }
 
     /**
+     * メモリから16bitで値を読み込む
+     *
+     * @return メモリから読み込んだ値(16bit)
+     */
+    private fun readMemoryFrom16Bit(): Short {
+        val value = memory.getValue(registerPC)
+        pcPlusOne()
+        return value.toShort()
+    }
+
+    /**
+     * レジスタにDDDアドレスを使用して値を書き込む
+     *
+     * @param ddd レジスタの宛先を表すビットパターン
+     * @param value 書き込む値
+     */
+    private fun insertValueFromDDD(ddd: Byte, value: Byte) {
+        when (ddd.toInt()) {
+            0x00 -> registerB = value
+            0x01 -> registerC = value
+            0x02 -> registerD = value
+            0x03 -> registerE = value
+            0x04 -> registerH = value
+            0x05 -> registerL = value
+            0x06 -> throw Exception("Unknown Address: 0x06")
+            0x07 -> registerA = value
+        }
+    }
+
+    /**
+     * レジスタからSSSアドレスを使用して値を読み込む
+     *
+     * @param sss レジスタの宛先を表すビットパターン
+     * @return レジスタから読み込んだ値
+     */
+    private fun getValueFromSSS(sss: Byte): Byte {
+        return when (sss.toInt()) {
+            0x00 -> registerB
+            0x01 -> registerC
+            0x02 -> registerD
+            0x03 -> registerE
+            0x04 -> registerH
+            0x05 -> registerL
+            0x06 -> throw Exception("Unknown Address: 0x06")
+            0x07 -> registerA
+            else -> {
+                throw Exception("Unknown Address: $sss")
+            }
+        }
+    }
+
+    /**
      * ccf: CarryFlagを完了する
      * 0x3F
      */
@@ -125,17 +179,35 @@ class Cpu(private val memory: Memory){
     }
 
     /**
+     * Aレジスタに入力された値を加算する
+     *
+     * @param value 加算する値
+     */
+    private fun addAr(value: Byte) {
+        val result = registerA + value
+        flagZero = result == 0x0
+        flagN = false
+        flagH = (registerA and 0xf) + (value and 0xf) > 0xf
+        flagCarry = result > 0xff
+        registerA = result.toByte()
+    }
+
+    /**
      * 命令を実行する
      */
     fun execInstructions() {
-        when (readMemoryFrom8Bit()) {
-            0x00.toByte() -> this.nop()
-            0x10.toByte() -> this.stop()
-            0x37.toByte() -> this.scf()
-            0x3f.toByte() -> this.ccf()
-            0x76.toByte() -> this.halt()
-            0xf3.toByte() -> this.di()
-            0xfb.toByte() -> this.ei()
+        val instruction = readMemoryFrom8Bit()
+        val value1 = instruction and 7
+
+        when (instruction.toInt()) {
+            0x00 -> this.nop()
+            0x10 -> this.stop()
+            0x37 -> this.scf()
+            0x3f -> this.ccf()
+            0x76 -> this.halt()
+            in 0x80..0x87 -> this.addAr(value1)
+            0xf3 -> this.di()
+            0xfb -> this.ei()
             else -> println("Unknown instruction")
         }
     }
