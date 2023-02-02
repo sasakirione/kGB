@@ -14,6 +14,11 @@ class Cpu(private val memory: Memory){
     private var flagH: Boolean = false
     private var flagCarry: Boolean = false
 
+    private var interruptMasterEnable: Boolean = false
+
+    /**
+     * レジスタの値をダンプする
+     */
     fun printRegisterDump() {
         println("A: ${registerA.toUByte().toString(16)}")
         println("B: ${registerB.toUByte().toString(16)}")
@@ -93,7 +98,7 @@ class Cpu(private val memory: Memory){
      * halt: 割り込みが発生するまでお休み
      * 0x76
      */
-    fun halt() {
+    private fun halt() {
         println("HALT")
     }
 
@@ -106,6 +111,20 @@ class Cpu(private val memory: Memory){
     }
 
     /**
+     * 割り込みを有効にする
+     */
+    private fun ei() {
+        interruptMasterEnable = true
+    }
+
+    /**
+     * 割り込みを無効にする
+     */
+    private fun di() {
+        interruptMasterEnable = false
+    }
+
+    /**
      * 命令を実行する
      */
     fun execInstructions() {
@@ -115,6 +134,8 @@ class Cpu(private val memory: Memory){
             0x37.toByte() -> this.scf()
             0x3f.toByte() -> this.ccf()
             0x76.toByte() -> this.halt()
+            0xf3.toByte() -> this.di()
+            0xfb.toByte() -> this.ei()
             else -> println("Unknown instruction")
         }
     }
