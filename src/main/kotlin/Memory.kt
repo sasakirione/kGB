@@ -1,5 +1,5 @@
 class Memory {
-    fun getValue(address: Short): Byte {
-        return 0x00
+    fun getValue(address: UShort): UByte {
+        return 0x00u
     }
 }
