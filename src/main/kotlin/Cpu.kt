@@ -1,4 +1,3 @@
-import kotlin.experimental.and
 
 class Cpu(private val memory: Memory){
     private var registerA: UByte = 0x00u
@@ -178,6 +177,7 @@ class Cpu(private val memory: Memory){
         interruptMasterEnable = false
     }
 
+    // 算術命令
     /**
      * Aレジスタに入力されたレジスタの値を加算する
      *
@@ -197,6 +197,11 @@ class Cpu(private val memory: Memory){
         addA(sourceValue)
     }
 
+    /**
+     * Aレジスタに入力された値を加算する
+     *
+     * @param sourceValue 加算する値
+     */
     private fun addA(sourceValue: UByte) {
         val result = registerA + sourceValue
         flagZero = result == 0x0u
@@ -207,6 +212,143 @@ class Cpu(private val memory: Memory){
     }
 
     /**
+     * Aレジスタに入力されたレジスタの値を繰り上がり加算する
+     * (桁数の大きい計算を桁ごとで分割して行う時に前回計算した時の繰り上がりを考慮できる)
+     *
+     * @param sss 加算するレジスタのアドレス+8
+     */
+    private fun adcAr(sss: UByte) {
+        val realSSS = sss - 8u
+        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        adcA(sourceValue)
+    }
+
+    /**
+     * AレジスタにHLレジスタに格納されたアドレスの値を繰り上がり加算する
+     * (桁数の大きい計算を桁ごとで分割して行う時に前回計算した時の繰り上がりを考慮できる)
+     */
+    private fun adcAHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = memory.getValue(sourceAddress.toUShort())
+        adcA(sourceValue)
+    }
+
+    /**
+     * Aレジスタに入力された値を繰り上がり加算する
+     * (桁数の大きい計算を桁ごとで分割して行う時に前回計算した時の繰り上がりを考慮できる)
+     */
+    private fun adcA(sourceValue: UByte) {
+        val result = registerA + sourceValue + if (flagCarry) 1u else 0u
+        flagZero = result == 0x0u
+        flagN = false
+        flagH = (registerA and 0xfu) + (sourceValue and 0xfu) > 0xfu
+        flagCarry = result > 0xffu
+        registerA = result.toUByte()
+    }
+
+    /**
+     * Aレジスタに入力されたレジスタの値を減算する
+     *
+     * @param sss 減算するレジスタのアドレス
+     */
+    private fun subAr(sss: UByte) {
+        val sourceValue = getValueFromSSS(sss)
+        subA(sourceValue)
+    }
+
+    /**
+     * AレジスタにHLレジスタに格納されたアドレスの値を減算する
+     */
+    private fun subAHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = memory.getValue(sourceAddress.toUShort())
+        subA(sourceValue)
+    }
+
+    /**
+     * Aレジスタに入力された値を減算する
+     *
+     * @param sourceValue 減算する値
+     */
+    private fun subA(sourceValue: UByte) {
+        val result = registerA - sourceValue
+        flagZero = result == 0x0u
+        flagN = true
+        flagH = (registerA and 0xfu) - (sourceValue and 0xfu) < 0x0u
+        flagCarry = result < 0x0u
+        registerA = result.toUByte()
+    }
+
+    /**
+     * Aレジスタに入力されたレジスタの値を論理積する
+     *
+     * @param sss 論理積するレジスタのアドレス
+     */
+    private fun andAr(sss: UByte) {
+        val sourceValue = getValueFromSSS(sss)
+        andA(sourceValue)
+    }
+
+    /**
+     * AレジスタにHLレジスタに格納されたアドレスの値を論理積する
+     */
+    private fun andAHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = memory.getValue(sourceAddress.toUShort())
+        andA(sourceValue)
+    }
+
+    /**
+     * Aレジスタに入力された値を論理積する
+     *
+     * @param sourceValue 論理積する値
+     */
+    private fun andA(sourceValue: UByte) {
+        val result = registerA and sourceValue
+        flagZero = result == 0x0u.toUByte()
+        flagN = false
+        flagH = true
+        flagCarry = false
+        registerA = result
+    }
+
+    // 8bit ロード命令
+    /**
+     * BCレジスタに格納されているアドレスの値をAレジスタにロードする
+     */
+    private fun ldABC() {
+        val sourceAddress = registerB * 16u + registerC
+        registerA = memory.getValue(sourceAddress.toUShort())
+    }
+
+    /**
+     * DEレジスタに格納されているアドレスの値をAレジスタにロードする
+     */
+    private fun ldADE() {
+        val sourceAddress = registerD * 16u + registerE
+        registerA = memory.getValue(sourceAddress.toUShort())
+    }
+
+    // 16bit ロード命令
+    /**
+     * HLレジスタにSPレジスタの値をロードする
+     */
+    private fun ldSPHL() {
+        val sourceAddress = registerH * 16u + registerL
+        registerSP = sourceAddress.toUShort()
+    }
+
+    // ジャンプ命令
+    /**
+     * HLレジスタに格納されているアドレスにジャンプする
+     */
+    private fun jpHL() {
+        val sourceAddress = registerH * 16u + registerL
+        registerPC = sourceAddress.toUShort()
+    }
+
+    // 命令を振り分けるアレアレアレ
+    /**
      * 命令を実行する
      */
     fun execInstructions() {
@@ -216,13 +358,23 @@ class Cpu(private val memory: Memory){
 
         when (instruction.toInt()) {
             0x00 -> this.nop()
+            0x0a -> this.ldABC()
             0x10 -> this.stop()
+            0x1a -> this.ldADE()
             0x37 -> this.scf()
             0x3f -> this.ccf()
             0x76 -> this.halt()
             0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x87 -> this.addAr(value1)
             0x86 -> this.addAHL()
+            0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8f -> this.adcAr(value1)
+            0x8e -> this.adcAHL()
+            0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x97 -> this.subAr(value1)
+            0x96 -> this.subAHL()
+            0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa7 -> this.andAr(value1)
+            0xa6 -> this.andAHL()
+            0xe9 -> this.jpHL()
             0xf3 -> this.di()
+            0xf9 -> this.ldSPHL()
             0xfb -> this.ei()
             else -> println("Unknown instruction")
         }
