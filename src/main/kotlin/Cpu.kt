@@ -123,6 +123,7 @@ class Cpu(private val memory: Memory){
         }
     }
 
+    // CPU制御命令
     /**
      * ccf: CarryFlagを完了する
      * 0x3F
@@ -314,6 +315,154 @@ class Cpu(private val memory: Memory){
 
     // 8bit ロード命令
     /**
+     * Bレジスタに入力されたレジスタの値を格納する
+     *
+     * @param sss 格納するレジスタのアドレス
+     */
+    private fun ldBr(sss: UByte) {
+        val sourceValue = getValueFromSSS(sss)
+        registerB = sourceValue
+    }
+
+    /**
+     * BレジスタにHLレジスタに格納されたアドレスの値を格納する
+     */
+    private fun ldBHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = getValueFromSSS(sourceAddress.toUByte())
+        registerB = sourceValue
+    }
+
+    /**
+     * Cレジスタに入力されたレジスタの値を格納する
+     *
+     * @param sss 格納するレジスタのアドレス+8
+     */
+    private fun ldCr(sss: UByte) {
+        val realSSS = sss - 8u
+        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        registerC = sourceValue
+    }
+
+    /**
+     * CレジスタにHLレジスタに格納されたアドレスの値を格納する
+     */
+    private fun ldCHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = getValueFromSSS(sourceAddress.toUByte())
+        registerC = sourceValue
+    }
+
+    /**
+     * Dレジスタに入力されたレジスタの値を格納する
+     *
+     * @param sss 格納するレジスタのアドレス
+     */
+    private fun ldDr(sss: UByte) {
+        val sourceValue = getValueFromSSS(sss)
+        registerD = sourceValue
+    }
+
+    /**
+     * DレジスタにHLレジスタに格納されたアドレスの値を格納する
+     */
+    private fun ldDHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = getValueFromSSS(sourceAddress.toUByte())
+        registerD = sourceValue
+    }
+
+    /**
+     * Eレジスタに入力されたレジスタの値を格納する
+     *
+     * @param sss 格納するレジスタのアドレス+8
+     */
+    private fun ldEr(sss: UByte) {
+        val realSSS = sss - 8u
+        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        registerE = sourceValue
+    }
+
+    /**
+     * EレジスタにHLレジスタに格納されたアドレスの値を格納する
+     */
+    private fun ldEHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = getValueFromSSS(sourceAddress.toUByte())
+        registerE = sourceValue
+    }
+
+    /**
+     * Hレジスタに入力されたレジスタの値を格納する
+     *
+     * @param sss 格納するレジスタのアドレス
+     */
+    private fun ldHr(sss: UByte) {
+        val sourceValue = getValueFromSSS(sss)
+        registerH = sourceValue
+    }
+
+    /**
+     * HレジスタにHLレジスタに格納されたアドレスの値を格納する
+     */
+    private fun ldHHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = getValueFromSSS(sourceAddress.toUByte())
+        registerH = sourceValue
+    }
+
+    /**
+     * Lレジスタに入力されたレジスタの値を格納する
+     *
+     * @param sss 格納するレジスタのアドレス+8
+     */
+    private fun ldLr(sss: UByte) {
+        val realSSS = sss - 8u
+        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        registerL = sourceValue
+    }
+
+    /**
+     * LレジスタにHLレジスタに格納されたアドレスの値を格納する
+     */
+    private fun ldLHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = getValueFromSSS(sourceAddress.toUByte())
+        registerL = sourceValue
+    }
+
+    /**
+     * HLレジスタに入力されたレジスタの値を格納する
+     *
+     * @param sss 格納するレジスタのアドレス
+     */
+    private fun ldHLr(sss: UByte) {
+        val sourceValue = getValueFromSSS(sss)
+        val destinationAddress = registerH * 16u + registerL
+        memory.setValue(destinationAddress.toUShort(), sourceValue)
+    }
+
+    /**
+     * HLレジスタに入力されたレジスタの値を格納する
+     *
+     * @param sss 格納するレジスタのアドレス+8
+     */
+    private fun ldAr(sss: UByte) {
+        val realSSS = sss - 8u
+        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        registerA = sourceValue
+    }
+
+    /**
+     * AレジスタにHLレジスタに格納されたアドレスの値を格納する
+     */
+    private fun ldAHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = getValueFromSSS(sourceAddress.toUByte())
+        registerA = sourceValue
+    }
+
+    /**
      * BCレジスタに格納されているアドレスの値をAレジスタにロードする
      */
     private fun ldABC() {
@@ -363,7 +512,22 @@ class Cpu(private val memory: Memory){
             0x1a -> this.ldADE()
             0x37 -> this.scf()
             0x3f -> this.ccf()
+            0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x47 -> this.ldBr(value1)
+            0x46 -> this.ldBHL()
+            0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4f -> this.ldCr(value1)
+            0x4e -> this.ldCHL()
+            0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x57 -> this.ldDr(value1)
+            0x56 -> this.ldDHL()
+            0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d, 0x5f -> this.ldEr(value1)
+            0x5e -> this.ldEHL()
+            0x60, 0x61, 0x62, 0x63, 0x64, 0x65, 0x67 -> this.ldHr(value1)
+            0x66 -> this.ldHHL()
+            0x68, 0x69, 0x6a, 0x6b, 0x6c, 0x6d, 0x6f -> this.ldLr(value1)
+            0x6e -> this.ldLHL()
+            0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x77 -> this.ldHLr(value1)
             0x76 -> this.halt()
+            0x78, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7f -> this.ldAr(value1)
+            0x7e -> this.ldAHL()
             0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x87 -> this.addAr(value1)
             0x86 -> this.addAHL()
             0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8f -> this.adcAr(value1)
