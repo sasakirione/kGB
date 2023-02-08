@@ -336,11 +336,10 @@ class Cpu(private val memory: Memory){
     /**
      * Cレジスタに入力されたレジスタの値を格納する
      *
-     * @param sss 格納するレジスタのアドレス+8
+     * @param sss 格納するレジスタのアドレス
      */
     private fun ldCr(sss: UByte) {
-        val realSSS = sss - 8u
-        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        val sourceValue = getValueFromSSS(sss)
         registerC = sourceValue
     }
 
@@ -375,11 +374,10 @@ class Cpu(private val memory: Memory){
     /**
      * Eレジスタに入力されたレジスタの値を格納する
      *
-     * @param sss 格納するレジスタのアドレス+8
+     * @param sss 格納するレジスタのアドレス
      */
     private fun ldEr(sss: UByte) {
-        val realSSS = sss - 8u
-        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        val sourceValue = getValueFromSSS(sss)
         registerE = sourceValue
     }
 
@@ -414,11 +412,10 @@ class Cpu(private val memory: Memory){
     /**
      * Lレジスタに入力されたレジスタの値を格納する
      *
-     * @param sss 格納するレジスタのアドレス+8
+     * @param sss 格納するレジスタのアドレス
      */
     private fun ldLr(sss: UByte) {
-        val realSSS = sss - 8u
-        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        val sourceValue = getValueFromSSS(sss)
         registerL = sourceValue
     }
 
@@ -445,11 +442,10 @@ class Cpu(private val memory: Memory){
     /**
      * HLレジスタに入力されたレジスタの値を格納する
      *
-     * @param sss 格納するレジスタのアドレス+8
+     * @param sss 格納するレジスタのアドレス
      */
     private fun ldAr(sss: UByte) {
-        val realSSS = sss - 8u
-        val sourceValue = getValueFromSSS(realSSS.toUByte())
+        val sourceValue = getValueFromSSS(sss)
         registerA = sourceValue
     }
 
