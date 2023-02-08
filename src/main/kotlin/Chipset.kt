@@ -1,4 +1,4 @@
-class Memory {
+class Chipset {
     fun getValue(address: UShort): UByte {
         return 0x00u
     }

@@ -1,5 +1,5 @@
 
-class Cpu(private val memory: Memory){
+class Cpu(private val chipset: Chipset){
     private var registerA: UByte = 0x00u
     private var registerB: UByte = 0x00u
     private var registerC: UByte = 0x00u
@@ -66,7 +66,7 @@ class Cpu(private val memory: Memory){
      * @return メモリから読み込んだ値(8bit)
      */
     private fun readMemoryFrom8Bit(): UByte {
-        val value = memory.getValue(registerPC)
+        val value = chipset.getValue(registerPC)
         pcPlusOne()
         return value
     }
@@ -77,7 +77,7 @@ class Cpu(private val memory: Memory){
      * @return メモリから読み込んだ値(16bit)
      */
     private fun readMemoryFrom16Bit(): UShort {
-        val value = memory.getValue(registerPC)
+        val value = chipset.getValue(registerPC)
         pcPlusOne()
         return value.toUShort()
     }
@@ -194,7 +194,7 @@ class Cpu(private val memory: Memory){
      */
     private fun addAHL() {
         val sourceAddress = registerH * 16u + registerL
-        val sourceValue = memory.getValue(sourceAddress.toUShort())
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
         addA(sourceValue)
     }
 
@@ -230,7 +230,7 @@ class Cpu(private val memory: Memory){
      */
     private fun adcAHL() {
         val sourceAddress = registerH * 16u + registerL
-        val sourceValue = memory.getValue(sourceAddress.toUShort())
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
         adcA(sourceValue)
     }
 
@@ -262,7 +262,7 @@ class Cpu(private val memory: Memory){
      */
     private fun subAHL() {
         val sourceAddress = registerH * 16u + registerL
-        val sourceValue = memory.getValue(sourceAddress.toUShort())
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
         subA(sourceValue)
     }
 
@@ -295,7 +295,7 @@ class Cpu(private val memory: Memory){
      */
     private fun andAHL() {
         val sourceAddress = registerH * 16u + registerL
-        val sourceValue = memory.getValue(sourceAddress.toUShort())
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
         andA(sourceValue)
     }
 
@@ -436,7 +436,7 @@ class Cpu(private val memory: Memory){
     private fun ldHLr(sss: UByte) {
         val sourceValue = getValueFromSSS(sss)
         val destinationAddress = registerH * 16u + registerL
-        memory.setValue(destinationAddress.toUShort(), sourceValue)
+        chipset.setValue(destinationAddress.toUShort(), sourceValue)
     }
 
     /**
@@ -463,7 +463,7 @@ class Cpu(private val memory: Memory){
      */
     private fun ldABC() {
         val sourceAddress = registerB * 16u + registerC
-        registerA = memory.getValue(sourceAddress.toUShort())
+        registerA = chipset.getValue(sourceAddress.toUShort())
     }
 
     /**
@@ -471,7 +471,7 @@ class Cpu(private val memory: Memory){
      */
     private fun ldADE() {
         val sourceAddress = registerD * 16u + registerE
-        registerA = memory.getValue(sourceAddress.toUShort())
+        registerA = chipset.getValue(sourceAddress.toUShort())
     }
 
     // 16bit ロード命令
