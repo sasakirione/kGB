@@ -163,6 +163,10 @@ class Cpu(private val chipset: Chipset){
      * 0x10
      */
     private fun stop() {
+        val value = readMemoryFrom8BitOfInstructions()
+        if (value != 0x00u.toUByte()) {
+            throw Exception("Unknown value: $value")
+        }
         println("STOP")
     }
 
@@ -501,6 +505,18 @@ class Cpu(private val chipset: Chipset){
 
     // ジャンプ命令
     /**
+     * 入力されたアドレスにジャンプする
+     */
+    private fun jpNN() {
+        val sourceAddress1 = readMemoryFrom8BitOfInstructions()
+        val sourceAddress2 = readMemoryFrom8BitOfInstructions()
+        registerPC = (sourceAddress1 * 16u + sourceAddress2).toUShort()
+        tickFourCycle()
+        tickFourCycle()
+        tickFourCycle()
+    }
+
+    /**
      * HLレジスタに格納されているアドレスにジャンプする
      */
     private fun jpHL() {
@@ -547,6 +563,7 @@ class Cpu(private val chipset: Chipset){
             0x96 -> this.subAHL()
             0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa7 -> this.andAr(value1)
             0xa6 -> this.andAHL()
+            0xc3 -> this.jpNN()
             0xe9 -> this.jpHL()
             0xf3 -> this.di()
             0xf9 -> this.ldSPHL()
