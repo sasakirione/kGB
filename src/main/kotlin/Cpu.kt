@@ -445,14 +445,26 @@ class Cpu(private val chipset: Chipset){
     }
 
     /**
-     * HLレジスタに入力されたレジスタの値を格納する
+     * 入力されたレジスタの値をHLレジスタのアドレスに格納する
      *
-     * @param sss 格納するレジスタのアドレス
+     * @param sss 入力されたレジスタのアドレス
      */
     private fun ldHLr(sss: UByte) {
         val sourceValue = getValueFromSSS(sss)
         val destinationAddress = registerH * 16u + registerL
         chipset.setValue(destinationAddress.toUShort(), sourceValue)
+        tickFourCycle()
+    }
+
+    /**
+     * 入力された値をHLレジスタのアドレスに格納する
+     */
+    private fun ldHLN() {
+        val sourceValue = readMemoryFrom8BitOfInstructions()
+        val destinationAddress = registerH * 16u + registerL
+        chipset.setValue(destinationAddress.toUShort(), sourceValue)
+        tickFourCycle()
+        tickFourCycle()
     }
 
     /**
@@ -490,6 +502,24 @@ class Cpu(private val chipset: Chipset){
     private fun ldADE() {
         val sourceAddress = registerD * 16u + registerE
         registerA = chipset.getValue(sourceAddress.toUShort())
+        tickFourCycle()
+    }
+
+    /**
+     * Aレジスタに格納された値をBCレジスタに格納されたアドレスに格納する
+     */
+    private fun ldBCA() {
+        val destinationAddress = registerB * 16u + registerC
+        chipset.setValue(destinationAddress.toUShort(), registerA)
+        tickFourCycle()
+    }
+
+    /**
+     * Aレジスタに格納された値をDEレジスタに格納されたアドレスに格納する
+     */
+    private fun ldDEA() {
+        val destinationAddress = registerD * 16u + registerE
+        chipset.setValue(destinationAddress.toUShort(), registerA)
         tickFourCycle()
     }
 
@@ -534,9 +564,12 @@ class Cpu(private val chipset: Chipset){
 
         when (instruction.toInt()) {
             0x00 -> this.nop()
+            0x02 -> this.ldBCA()
             0x0a -> this.ldABC()
             0x10 -> this.stop()
+            0x12 -> this.ldDEA()
             0x1a -> this.ldADE()
+            0x36 -> this.ldHLN()
             0x37 -> this.scf()
             0x3f -> this.ccf()
             0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x47 -> this.ldBr(value1)
