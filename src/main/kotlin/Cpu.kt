@@ -23,18 +23,18 @@ class Cpu(private val chipset: Chipset){
      * レジスタの値をダンプする
      */
     fun printRegisterDump() {
-        println("A: ${registerA.toString(16)}")
-        println("B: ${registerB.toString(16)}")
-        println("C: ${registerC.toString(16)}")
-        println("D: ${registerD.toString(16)}")
-        println("E: ${registerE.toString(16)}")
-        println("H: ${registerH.toString(16)}")
+        print("A: ${registerA.toString(16)}, ")
+        print("B: ${registerB.toString(16)}, ")
+        print("C: ${registerC.toString(16)}, ")
+        print("D: ${registerD.toString(16)}, ")
+        print("E: ${registerE.toString(16)},")
+        print("H: ${registerH.toString(16)}, ")
         println("L: ${registerL.toString(16)}")
-        println("SP: ${registerSP.toString(16)}")
+        print("SP: ${registerSP.toString(16)}, ")
         println("PC: ${registerPC.toString(16)}")
-        println("Z: ${getFlagZ().toString(16)}")
-        println("N: ${getFlagN().toString(16)}")
-        println("H: ${getFlagH().toString(16)}")
+        print("Z: ${getFlagZ().toString(16)}, ")
+        print("N: ${getFlagN().toString(16)}, ")
+        print("H: ${getFlagH().toString(16)}, ")
         println("C: ${getFlagC().toString(16)}")
     }
 
@@ -794,7 +794,9 @@ class Cpu(private val chipset: Chipset){
             0xf3 -> this.di()
             0xf9 -> this.ldSPHL()
             0xfb -> this.ei()
-            else -> println("Unknown instruction")
+            else -> {
+                error("存在しない命令です: $instruction")
+            }
         }
         tickFourCycle()
     }
