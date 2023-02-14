@@ -31,9 +31,23 @@ class Cartridge(romName: String): IO {
 
 
     override fun getValue(address: UShort): UByte {
-        return 0u
+        val value = when (address) {
+            in 0x0000u..0x7fffu -> rom[address.toInt()]
+            in 0xa000u..0xbfffu -> ram[address.toInt() - 0xa000]
+            else -> {
+                throw Exception("カートリッジの存在しない領域を読み込もうとしています。")
+            }
+        }
+        return value
     }
 
     override fun setValue(address: UShort, sourceValue: UByte) {
+        when (address) {
+            in 0x0000u..0x7fffu -> rom[address.toInt()] = sourceValue
+            in 0xa000u..0xbfffu -> ram[address.toInt() - 0xa000] = sourceValue
+            else -> {
+                throw Exception("カートリッジの存在しない領域に書き込もうとしています。")
+            }
+        }
     }
 }
