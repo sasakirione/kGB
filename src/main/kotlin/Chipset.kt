@@ -45,6 +45,7 @@ class Chipset {
             in 0xc000u..0xdfffu -> memory[address.toInt() - 0xc000] = sourceValue
             in 0xff80u..0xfffeu -> highMemory[address.toInt() - 0xff80] = sourceValue
             in 0xe000u..0xfdffu -> memory[address.toInt() - (0xe000+0x2000)] = sourceValue
+            in 0xffffu..0xffffu -> interruptEnableRegister = sourceValue
             else -> {}
         }
     }
