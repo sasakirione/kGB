@@ -323,6 +323,46 @@ class Cpu(private val chipset: Chipset){
         registerA = result
     }
 
+    /**
+     * BCレジスタに格納されたアドレスの値をインクリメントする
+     */
+    private fun incBC() {
+        val sourceAddress = registerB * 16u + registerC
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
+        val result = sourceValue + 1u
+        chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+    }
+
+    /**
+     * DEレジスタに格納されたアドレスの値をインクリメントする
+     */
+    private fun incDE() {
+        val sourceAddress = registerD * 16u + registerE
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
+        val result = sourceValue + 1u
+        chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+    }
+
+    /**
+     * HLレジスタに格納されたアドレスの値をインクリメントする
+     */
+    private fun incHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
+        val result = sourceValue + 1u
+        chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+    }
+
+    /**
+     * SPレジスタに格納されたアドレスの値をインクリメントする
+     */
+    private fun incSP() {
+        val sourceAddress = registerSP
+        val sourceValue = chipset.getValue(sourceAddress)
+        val result = sourceValue + 1u
+        chipset.setValue(sourceAddress, result.toUByte())
+    }
+
     // 8bit ロード命令
     /**
      * Bレジスタに入力されたレジスタの値を格納する
@@ -565,10 +605,14 @@ class Cpu(private val chipset: Chipset){
         when (instruction.toInt()) {
             0x00 -> this.nop()
             0x02 -> this.ldBCA()
+            0x03 -> this.incBC()
             0x0a -> this.ldABC()
             0x10 -> this.stop()
             0x12 -> this.ldDEA()
+            0x13 -> this.incDE()
             0x1a -> this.ldADE()
+            0x23 -> this.incHL()
+            0x33 -> this.incSP()
             0x36 -> this.ldHLN()
             0x37 -> this.scf()
             0x3f -> this.ccf()
