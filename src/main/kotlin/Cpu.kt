@@ -331,6 +331,7 @@ class Cpu(private val chipset: Chipset){
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue + 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+        tickFourCycle()
     }
 
     /**
@@ -341,6 +342,7 @@ class Cpu(private val chipset: Chipset){
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue + 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+        tickFourCycle()
     }
 
     /**
@@ -351,6 +353,7 @@ class Cpu(private val chipset: Chipset){
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue + 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+        tickFourCycle()
     }
 
     /**
@@ -361,6 +364,51 @@ class Cpu(private val chipset: Chipset){
         val sourceValue = chipset.getValue(sourceAddress)
         val result = sourceValue + 1u
         chipset.setValue(sourceAddress, result.toUByte())
+        tickFourCycle()
+    }
+
+    /**
+     * BCレジスタに格納されたアドレスの値をデクリメントする
+     */
+    private fun decBC() {
+        val sourceAddress = registerB * 16u + registerC
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
+        val result = sourceValue - 1u
+        chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+        tickFourCycle()
+    }
+
+    /**
+     * DEレジスタに格納されたアドレスの値をデクリメントする
+     */
+    private fun decDE() {
+        val sourceAddress = registerD * 16u + registerE
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
+        val result = sourceValue - 1u
+        chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+        tickFourCycle()
+    }
+
+    /**
+     * HLレジスタに格納されたアドレスの値をデクリメントする
+     */
+    private fun decHL() {
+        val sourceAddress = registerH * 16u + registerL
+        val sourceValue = chipset.getValue(sourceAddress.toUShort())
+        val result = sourceValue - 1u
+        chipset.setValue(sourceAddress.toUShort(), result.toUByte())
+        tickFourCycle()
+    }
+
+    /**
+     * SPレジスタに格納されたアドレスの値をデクリメントする
+     */
+    private fun decSP() {
+        val sourceAddress = registerSP
+        val sourceValue = chipset.getValue(sourceAddress)
+        val result = sourceValue - 1u
+        chipset.setValue(sourceAddress, result.toUByte())
+        tickFourCycle()
     }
 
     /**
@@ -697,20 +745,24 @@ class Cpu(private val chipset: Chipset){
             0x03 -> this.incBC()
             0x04 -> this.incB()
             0x0a -> this.ldABC()
+            0x0b -> this.decBC()
             0x0c -> this.incC()
             0x10 -> this.stop()
             0x12 -> this.ldDEA()
             0x13 -> this.incDE()
             0x14 -> this.incD()
             0x1a -> this.ldADE()
+            0x1b -> this.decDE()
             0x1c -> this.incE()
             0x23 -> this.incHL()
             0x24 -> this.incH()
+            0x2b -> this.decHL()
             0x2c -> this.incL()
             0x33 -> this.incSP()
             0x34 -> this.incHL2()
             0x36 -> this.ldHLN()
             0x37 -> this.scf()
+            0x3b -> this.decSP()
             0x3c -> this.incA()
             0x3f -> this.ccf()
             0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x47 -> this.ldBr(value1)
