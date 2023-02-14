@@ -10,6 +10,11 @@ class Chipset {
     private var highMemory: UByteArray = UByteArray(0x7f)
 
     /**
+     * 割り込み有効化レジスタ(IE)
+     */
+    private var interruptEnableRegister: UByte = 0u
+
+    /**
      * 16bitアドレスから値を読み出す
      *
      * @param address 16bitアドレス
@@ -20,6 +25,8 @@ class Chipset {
         val value = when (address) {
             in 0xc000u..0xdfffu -> memory[address.toInt() - 0xc000]
             in 0xff80u..0xfffeu -> highMemory[address.toInt() - 0xff80]
+            in 0xe000u..0xfdffu -> memory[address.toInt() - (0xe000+0x2000)]
+            in 0xffffu..0xffffu -> interruptEnableRegister
             else -> 0xffu
         }
         return value
@@ -37,6 +44,7 @@ class Chipset {
         when (address) {
             in 0xc000u..0xdfffu -> memory[address.toInt() - 0xc000] = sourceValue
             in 0xff80u..0xfffeu -> highMemory[address.toInt() - 0xff80] = sourceValue
+            in 0xe000u..0xfdffu -> memory[address.toInt() - (0xe000+0x2000)] = sourceValue
             else -> {}
         }
     }
