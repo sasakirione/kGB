@@ -1,7 +1,9 @@
+import io.Cartridge
+import io.IO
 import util.Logger.warn
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class Chipset {
+class Chipset(romName: String) {
     /**
      * メモリ
      */
@@ -10,6 +12,10 @@ class Chipset {
      * Highメモリ
      */
     private var highMemory: UByteArray = UByteArray(0x7f)
+    /**
+     * カートリッジ
+     */
+    private val cartridge: IO = Cartridge(romName)
 
     /**
      * 割り込み有効化レジスタ(IE)
