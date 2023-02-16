@@ -1,5 +1,5 @@
 fun main() {
-    val chipset = Chipset("cpu_instrs")
+    val chipset = Chipset("pokemon_red")
     val cpu = Cpu(chipset)
 
     while (true) {

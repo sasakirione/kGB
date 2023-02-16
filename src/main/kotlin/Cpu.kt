@@ -36,6 +36,7 @@ class Cpu(private val chipset: Chipset){
         print("N: ${getFlagN().toString(16)}, ")
         print("H: ${getFlagH().toString(16)}, ")
         println("C: ${getFlagC().toString(16)}")
+        println("tick: ${tick.toString(16)}")
         println("--------------------------------------------------------")
     }
 
@@ -70,6 +71,7 @@ class Cpu(private val chipset: Chipset){
      */
     private fun readMemoryFrom8BitOfInstructions(): UByte {
         val value = chipset.getValue(registerPC)
+        println("Instruction: ${value.toString(16)}")
         pcPlusOne()
         return value
     }
@@ -200,7 +202,7 @@ class Cpu(private val chipset: Chipset){
      * AレジスタにHLレジスタに格納されたアドレスの値を加算する
      */
     private fun addAHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         addA(sourceValue)
         tickFourCycle()
@@ -237,7 +239,7 @@ class Cpu(private val chipset: Chipset){
      * (桁数の大きい計算を桁ごとで分割して行う時に前回計算した時の繰り上がりを考慮できる)
      */
     private fun adcAHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         adcA(sourceValue)
         tickFourCycle()
@@ -270,7 +272,7 @@ class Cpu(private val chipset: Chipset){
      * AレジスタにHLレジスタに格納されたアドレスの値を減算する
      */
     private fun subAHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         subA(sourceValue)
         tickFourCycle()
@@ -304,7 +306,7 @@ class Cpu(private val chipset: Chipset){
      * AレジスタにHLレジスタに格納されたアドレスの値を論理積する
      */
     private fun andAHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         andA(sourceValue)
         tickFourCycle()
@@ -328,7 +330,7 @@ class Cpu(private val chipset: Chipset){
      * BCレジスタに格納されたアドレスの値をインクリメントする
      */
     private fun incBC() {
-        val sourceAddress = registerB * 16u + registerC
+        val sourceAddress = registerB * 256u + registerC
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue + 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
@@ -339,7 +341,7 @@ class Cpu(private val chipset: Chipset){
      * DEレジスタに格納されたアドレスの値をインクリメントする
      */
     private fun incDE() {
-        val sourceAddress = registerD * 16u + registerE
+        val sourceAddress = registerD * 256u + registerE
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue + 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
@@ -350,7 +352,7 @@ class Cpu(private val chipset: Chipset){
      * HLレジスタに格納されたアドレスの値をインクリメントする
      */
     private fun incHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue + 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
@@ -372,7 +374,7 @@ class Cpu(private val chipset: Chipset){
      * BCレジスタに格納されたアドレスの値をデクリメントする
      */
     private fun decBC() {
-        val sourceAddress = registerB * 16u + registerC
+        val sourceAddress = registerB * 256u + registerC
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue - 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
@@ -383,7 +385,7 @@ class Cpu(private val chipset: Chipset){
      * DEレジスタに格納されたアドレスの値をデクリメントする
      */
     private fun decDE() {
-        val sourceAddress = registerD * 16u + registerE
+        val sourceAddress = registerD * 256u + registerE
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue - 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
@@ -394,7 +396,7 @@ class Cpu(private val chipset: Chipset){
      * HLレジスタに格納されたアドレスの値をデクリメントする
      */
     private fun decHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = chipset.getValue(sourceAddress.toUShort())
         val result = sourceValue - 1u
         chipset.setValue(sourceAddress.toUShort(), result.toUByte())
@@ -493,7 +495,7 @@ class Cpu(private val chipset: Chipset){
      * HLレジスタの値をインクリメントする
      */
     private fun incHL2() {
-        val hl = registerH * 16u + registerL
+        val hl = registerH * 256u + registerL
         val value = hl + 1u
         registerH = (value / 16u).toUByte()
         registerL = (value % 16u).toUByte()
@@ -582,7 +584,7 @@ class Cpu(private val chipset: Chipset){
      * HLレジスタの値をデクリメントする
      */
     private fun decHL2() {
-        val hl = registerH * 16u + registerL
+        val hl = registerH * 256u + registerL
         val value = hl - 1u
         registerH = (value / 16u).toUByte()
         registerL = (value % 16u).toUByte()
@@ -605,7 +607,7 @@ class Cpu(private val chipset: Chipset){
      * BレジスタにHLレジスタに格納されたアドレスの値を格納する
      */
     private fun ldBHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = getValueFromSSS(sourceAddress.toUByte())
         registerB = sourceValue
         tickFourCycle()
@@ -625,7 +627,7 @@ class Cpu(private val chipset: Chipset){
      * CレジスタにHLレジスタに格納されたアドレスの値を格納する
      */
     private fun ldCHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = getValueFromSSS(sourceAddress.toUByte())
         registerC = sourceValue
         tickFourCycle()
@@ -645,7 +647,7 @@ class Cpu(private val chipset: Chipset){
      * DレジスタにHLレジスタに格納されたアドレスの値を格納する
      */
     private fun ldDHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = getValueFromSSS(sourceAddress.toUByte())
         registerD = sourceValue
         tickFourCycle()
@@ -665,7 +667,7 @@ class Cpu(private val chipset: Chipset){
      * EレジスタにHLレジスタに格納されたアドレスの値を格納する
      */
     private fun ldEHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = getValueFromSSS(sourceAddress.toUByte())
         registerE = sourceValue
         tickFourCycle()
@@ -685,7 +687,7 @@ class Cpu(private val chipset: Chipset){
      * HレジスタにHLレジスタに格納されたアドレスの値を格納する
      */
     private fun ldHHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = getValueFromSSS(sourceAddress.toUByte())
         registerH = sourceValue
         tickFourCycle()
@@ -705,7 +707,7 @@ class Cpu(private val chipset: Chipset){
      * LレジスタにHLレジスタに格納されたアドレスの値を格納する
      */
     private fun ldLHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = getValueFromSSS(sourceAddress.toUByte())
         registerL = sourceValue
         tickFourCycle()
@@ -718,7 +720,7 @@ class Cpu(private val chipset: Chipset){
      */
     private fun ldHLr(sss: UByte) {
         val sourceValue = getValueFromSSS(sss)
-        val destinationAddress = registerH * 16u + registerL
+        val destinationAddress = registerH * 256u + registerL
         chipset.setValue(destinationAddress.toUShort(), sourceValue)
         tickFourCycle()
     }
@@ -728,7 +730,7 @@ class Cpu(private val chipset: Chipset){
      */
     private fun ldHLN() {
         val sourceValue = readMemoryFrom8BitOfInstructions()
-        val destinationAddress = registerH * 16u + registerL
+        val destinationAddress = registerH * 256u + registerL
         chipset.setValue(destinationAddress.toUShort(), sourceValue)
         tickFourCycle()
         tickFourCycle()
@@ -748,7 +750,7 @@ class Cpu(private val chipset: Chipset){
      * AレジスタにHLレジスタに格納されたアドレスの値を格納する
      */
     private fun ldAHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         val sourceValue = getValueFromSSS(sourceAddress.toUByte())
         registerA = sourceValue
         tickFourCycle()
@@ -758,7 +760,7 @@ class Cpu(private val chipset: Chipset){
      * BCレジスタに格納されているアドレスの値をAレジスタにロードする
      */
     private fun ldABC() {
-        val sourceAddress = registerB * 16u + registerC
+        val sourceAddress = registerB * 256u + registerC
         registerA = chipset.getValue(sourceAddress.toUShort())
         tickFourCycle()
     }
@@ -767,7 +769,7 @@ class Cpu(private val chipset: Chipset){
      * DEレジスタに格納されているアドレスの値をAレジスタにロードする
      */
     private fun ldADE() {
-        val sourceAddress = registerD * 16u + registerE
+        val sourceAddress = registerD * 256u + registerE
         registerA = chipset.getValue(sourceAddress.toUShort())
         tickFourCycle()
     }
@@ -776,7 +778,7 @@ class Cpu(private val chipset: Chipset){
      * Aレジスタに格納された値をBCレジスタに格納されたアドレスに格納する
      */
     private fun ldBCA() {
-        val destinationAddress = registerB * 16u + registerC
+        val destinationAddress = registerB * 256u + registerC
         chipset.setValue(destinationAddress.toUShort(), registerA)
         tickFourCycle()
     }
@@ -785,8 +787,17 @@ class Cpu(private val chipset: Chipset){
      * Aレジスタに格納された値をDEレジスタに格納されたアドレスに格納する
      */
     private fun ldDEA() {
-        val destinationAddress = registerD * 16u + registerE
+        val destinationAddress = registerD * 256u + registerE
         chipset.setValue(destinationAddress.toUShort(), registerA)
+        tickFourCycle()
+    }
+
+    /**
+     * Bレジスタに入力された値を格納する
+     */
+    private fun ldBN() {
+        val sourceValue = readMemoryFrom8BitOfInstructions()
+        registerB = sourceValue
         tickFourCycle()
     }
 
@@ -795,8 +806,20 @@ class Cpu(private val chipset: Chipset){
      * HLレジスタにSPレジスタの値をロードする
      */
     private fun ldSPHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         registerSP = sourceAddress.toUShort()
+        tickFourCycle()
+    }
+
+    /**
+     * BCレジスタに入力された値を格納する
+     */
+    private fun ldBCNN() {
+        val sourceAddress1 = readMemoryFrom8BitOfInstructions()
+        val sourceAddress2 = readMemoryFrom8BitOfInstructions()
+        registerB = sourceAddress1
+        registerC = sourceAddress2
+        tickFourCycle()
         tickFourCycle()
     }
 
@@ -807,7 +830,7 @@ class Cpu(private val chipset: Chipset){
     private fun jpNN() {
         val sourceAddress1 = readMemoryFrom8BitOfInstructions()
         val sourceAddress2 = readMemoryFrom8BitOfInstructions()
-        registerPC = (sourceAddress1 * 16u + sourceAddress2).toUShort()
+        registerPC = (sourceAddress1 * 256u + sourceAddress2).toUShort()
         tickFourCycle()
         tickFourCycle()
         tickFourCycle()
@@ -817,8 +840,18 @@ class Cpu(private val chipset: Chipset){
      * HLレジスタに格納されているアドレスにジャンプする
      */
     private fun jpHL() {
-        val sourceAddress = registerH * 16u + registerL
+        val sourceAddress = registerH * 256u + registerL
         registerPC = sourceAddress.toUShort()
+    }
+
+    /**
+     * 指定されたレジスタに入っているアドレス分PCをすすめる
+     */
+    private fun jr() {
+        val sourceAddress = readMemoryFrom8BitOfInstructions()
+        registerPC = (registerPC + sourceAddress.toUShort()).toUShort()
+        tickFourCycle()
+        tickFourCycle()
     }
 
     /**
@@ -827,7 +860,7 @@ class Cpu(private val chipset: Chipset){
     private fun callNN() {
         val sourceAddress1 = readMemoryFrom8BitOfInstructions()
         val sourceAddress2 = readMemoryFrom8BitOfInstructions()
-        val sourceAddress = sourceAddress1 * 16u + sourceAddress2
+        val sourceAddress = sourceAddress1 * 256u + sourceAddress2
         registerSP = (registerSP - 2u).toUShort()
         chipset.setValue(registerSP, registerPC.toUByte())
         registerPC = sourceAddress.toUShort()
@@ -849,6 +882,15 @@ class Cpu(private val chipset: Chipset){
         tickFourCycle()
     }
 
+    private fun rst38() {
+        registerSP = (registerSP - 2u).toUShort()
+        chipset.setValue(registerSP, registerPC.toUByte())
+        registerPC = 0x38u.toUShort()
+        tickFourCycle()
+        tickFourCycle()
+        tickFourCycle()
+    }
+
     // 命令を振り分けるアレアレアレ
     /**
      * 命令を実行する
@@ -859,10 +901,12 @@ class Cpu(private val chipset: Chipset){
 
         when (instruction.toInt()) {
             0x00 -> this.nop()
+            0x01 -> this.ldBCNN()
             0x02 -> this.ldBCA()
             0x03 -> this.incBC()
             0x04 -> this.incB()
             0x05 -> this.decB()
+            0x06 -> this.ldBN()
             0x0a -> this.ldABC()
             0x0b -> this.decBC()
             0x0c -> this.incC()
@@ -872,6 +916,7 @@ class Cpu(private val chipset: Chipset){
             0x13 -> this.incDE()
             0x14 -> this.incD()
             0x15 -> this.decD()
+            0x18 -> this.jr()
             0x1a -> this.ldADE()
             0x1b -> this.decDE()
             0x1c -> this.incE()
@@ -922,8 +967,9 @@ class Cpu(private val chipset: Chipset){
             0xf3 -> this.di()
             0xf9 -> this.ldSPHL()
             0xfb -> this.ei()
+            0xff -> this.rst38()
             else -> {
-                error("存在しない命令です: $instruction")
+                error("存在しない命令です: ${instruction.toString(16)}")
             }
         }
         tickFourCycle()

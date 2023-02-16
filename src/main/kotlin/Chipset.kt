@@ -1,4 +1,5 @@
 import io.Cartridge
+import io.Graphic
 import io.IO
 import util.Logger.warn
 
@@ -16,6 +17,10 @@ class Chipset(romName: String) {
      * カートリッジ
      */
     private val cartridge: IO = Cartridge(romName)
+    /**
+     * グラフィック
+     */
+    private val graphic: IO = Graphic()
 
     /**
      * 割り込み有効化レジスタ(IE)
@@ -31,10 +36,11 @@ class Chipset(romName: String) {
     fun getValue(address: UShort): UByte {
         val value = when (address) {
             in 0x0000u..0x7fffu -> cartridge.getValue(address)
+            in 0x8000u..0x9fffu -> graphic.getValue(address)
             in 0xa000u..0xbfffu -> cartridge.getValue(address)
             in 0xc000u..0xdfffu -> memory[address.toInt() - 0xc000]
             in 0xff80u..0xfffeu -> highMemory[address.toInt() - 0xff80]
-            in 0xe000u..0xfdffu -> memory[address.toInt() - (0xe000+0x2000)]
+            in 0xe000u..0xfdffu -> memory[(address.toInt() - 0xe000)]
             in 0xffffu..0xffffu -> interruptEnableRegister
             else -> {
                 warn("存在しないIO領域からの読み出しです。規定値の0xffを返します。")
@@ -53,6 +59,7 @@ class Chipset(romName: String) {
     fun setValue(address: UShort, sourceValue: UByte) {
         when (address) {
             in 0x0000u..0x7fffu -> cartridge.setValue(address, sourceValue)
+            in 0x8000u..0x9fffu -> graphic.setValue(address, sourceValue)
             in 0xa000u..0xbfffu -> cartridge.setValue(address, sourceValue)
             in 0xc000u..0xdfffu -> memory[address.toInt() - 0xc000] = sourceValue
             in 0xff80u..0xfffeu -> highMemory[address.toInt() - 0xff80] = sourceValue
