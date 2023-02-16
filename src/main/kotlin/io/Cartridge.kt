@@ -2,6 +2,7 @@ package io
 
 import util.Const.ROM_FOLDER
 import util.Const.SAVE_FOLDER
+import util.Logger.info
 import util.Logger.trace
 import java.io.File
 
@@ -11,6 +12,7 @@ class Cartridge(romName: String): IO {
     private var ram: UByteArray = UByteArray(0x2000)
     private val romPath: String = "$ROM_FOLDER/$romName.gb"
     private val ramPath: String = "$SAVE_FOLDER/$romName.sav"
+    val loadingRomName: String
 
     init {
         // カートリッジの読み込み
@@ -28,6 +30,10 @@ class Cartridge(romName: String): IO {
             ramStream.read(ram.asByteArray())
             ramStream.close()
         }
+        // カートリッジのタイトルを取得
+        val title = String(rom.copyOfRange(0x134, 0x143).map { it.toByte() }.toByteArray(), Charsets.US_ASCII)
+        info("カートリッジのタイトル: $title")
+        loadingRomName = title
     }
 
 

@@ -1,3 +1,4 @@
+import util.Logger
 
 class Cpu(private val chipset: Chipset){
     private var registerA: UByte = 0x00u
@@ -71,7 +72,7 @@ class Cpu(private val chipset: Chipset){
      */
     private fun readMemoryFrom8BitOfInstructions(): UByte {
         val value = chipset.getValue(registerPC)
-        println("Instruction: ${value.toString(16)}")
+        Logger.trace("Instruction: ${value.toString(16)}")
         pcPlusOne()
         return value
     }
@@ -150,7 +151,7 @@ class Cpu(private val chipset: Chipset){
      * 0x00
      */
     private fun nop() {
-        println("NOP")
+        Logger.trace("NOP")
     }
 
     /**
@@ -158,7 +159,7 @@ class Cpu(private val chipset: Chipset){
      * 0x76
      */
     private fun halt() {
-        println("HALT")
+        Logger.trace("HALT")
     }
 
     /**
@@ -170,7 +171,7 @@ class Cpu(private val chipset: Chipset){
         if (value != 0x00u.toUByte()) {
             throw Exception("Unknown value: $value")
         }
-        println("STOP")
+        Logger.trace("STOP")
     }
 
     /**
