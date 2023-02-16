@@ -3,7 +3,7 @@ package io
 import util.Logger
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class Graphic : IO {
+class Graphic {
     private val SCREEN_WIDTH = 160
     private val SCREEN_HEIGHT = 144
 
@@ -18,7 +18,7 @@ class Graphic : IO {
 
     private var vramStatus: UByte = 0u
 
-    override fun getValue(address: UShort): UByte {
+    fun getValue(address: UShort): UByte {
         val value = when (address) {
             in 0x8000u..0x9fffu -> {
                 if (vramStatus.toInt() and 0x3 == 0x3) {
@@ -45,7 +45,7 @@ class Graphic : IO {
         return value
     }
 
-    override fun setValue(address: UShort, sourceValue: UByte) {
+    fun setValue(address: UShort, sourceValue: UByte) {
         when (address) {
             in 0x8000u..0x9fffu -> vram[address.toInt() - 0x8000] = sourceValue
             in 0xfe00u..0xfe9fu -> oam[address.toInt() - 0xfe00] = sourceValue
@@ -54,10 +54,6 @@ class Graphic : IO {
                 Logger.warn("存在しないGraphicIO領域への書き込みです。")
             }
         }
-    }
-
-    override fun refresh(tick: UByte) {
-        TODO("Not yet implemented")
     }
 
 }

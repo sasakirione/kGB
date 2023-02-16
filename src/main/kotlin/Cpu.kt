@@ -19,11 +19,12 @@ class Cpu(private val chipset: Chipset){
     private var flagCarry: Boolean = false
 
     private var interruptMasterEnable: Boolean = false
+    private var isHalted: Boolean = false
 
     /**
      * レジスタの値をダンプする
      */
-    fun printRegisterDump() {
+    private fun printRegisterDump() {
         print("A: ${registerA.toString(16)}, ")
         print("B: ${registerB.toString(16)}, ")
         print("C: ${registerC.toString(16)}, ")
@@ -37,7 +38,6 @@ class Cpu(private val chipset: Chipset){
         print("N: ${getFlagN().toString(16)}, ")
         print("H: ${getFlagH().toString(16)}, ")
         println("C: ${getFlagC().toString(16)}")
-        println("tick: ${tick.toString(16)}")
         println("--------------------------------------------------------")
     }
 
@@ -160,6 +160,7 @@ class Cpu(private val chipset: Chipset){
      */
     private fun halt() {
         Logger.trace("HALT")
+        isHalted = true
     }
 
     /**
@@ -892,6 +893,26 @@ class Cpu(private val chipset: Chipset){
         tickFourCycle()
     }
 
+    fun step(): Int {
+        var total = 0
+        tick = 0u
+
+        if (isHalted) {
+            tickFourCycle()
+        } else {
+            execInstructions()
+        }
+        total += tick.toInt()
+
+        if (interruptMasterEnable) {
+            tick = 0u
+
+            total += tick.toInt()
+        }
+        printRegisterDump()
+        return total
+    }
+
     // 命令を振り分けるアレアレアレ
     /**
      * 命令を実行する
@@ -978,5 +999,9 @@ class Cpu(private val chipset: Chipset){
 
     private fun tickFourCycle() {
         tick = (tick + 4u).toUByte()
+    }
+
+    fun byOneFrame() {
+        chipset.endDisposal()
     }
 }

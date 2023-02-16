@@ -1,6 +1,5 @@
 import io.Cartridge
 import io.Graphic
-import io.IO
 import util.Logger.warn
 
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -16,11 +15,11 @@ class Chipset(romName: String) {
     /**
      * カートリッジ
      */
-    private val cartridge: IO = Cartridge(romName)
+    private val cartridge: Cartridge = Cartridge(romName)
     /**
      * グラフィック
      */
-    private val graphic: IO = Graphic()
+    private val graphic: Graphic = Graphic()
 
     /**
      * 割り込み有効化レジスタ(IE)
@@ -72,5 +71,9 @@ class Chipset(romName: String) {
                 warn("存在しないIO領域への書き込みです。")
             }
         }
+    }
+
+    fun endDisposal() {
+        cartridge.writeSaveData()
     }
 }

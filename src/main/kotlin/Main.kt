@@ -3,7 +3,12 @@ fun main() {
     val cpu = Cpu(chipset)
 
     while (true) {
-        cpu.execInstructions()
-        cpu.printRegisterDump()
+        var step = 0
+        while (true) {
+            step += cpu.step()
+            if (step >= 456 * (144 + 10)) {
+                break
+            }
+        }
     }
 }
