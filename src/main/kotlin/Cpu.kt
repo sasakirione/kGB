@@ -500,6 +500,95 @@ class Cpu(private val chipset: Chipset){
         tickFourCycle()
     }
 
+    /**
+     * Bレジスタの値をデクリメントする
+     */
+    private fun decB() {
+        val result = registerB - 1u
+        flagZero = result == 0x0u
+        flagN = true
+        flagH = (registerB and 0xfu) - 1u < 0x0u
+        registerB = result.toUByte()
+    }
+
+    /**
+     * Cレジスタの値をデクリメントする
+     */
+    private fun decC() {
+        val result = registerC - 1u
+        flagZero = result == 0x0u
+        flagN = true
+        flagH = (registerC and 0xfu) - 1u < 0x0u
+        registerC = result.toUByte()
+    }
+
+    /**
+     * Dレジスタの値をデクリメントする
+     */
+    private fun decD() {
+        val result = registerD - 1u
+        flagZero = result == 0x0u
+        flagN = true
+        flagH = (registerD and 0xfu) - 1u < 0x0u
+        registerD = result.toUByte()
+    }
+
+    /**
+     * Eレジスタの値をデクリメントする
+     */
+    private fun decE() {
+        val result = registerE - 1u
+        flagZero = result == 0x0u
+        flagN = true
+        flagH = (registerE and 0xfu) - 1u < 0x0u
+        registerE = result.toUByte()
+    }
+
+    /**
+     * Hレジスタの値をデクリメントする
+     */
+    private fun decH() {
+        val result = registerH - 1u
+        flagZero = result == 0x0u
+        flagN = true
+        flagH = (registerH and 0xfu) - 1u < 0x0u
+        registerH = result.toUByte()
+    }
+
+    /**
+     * Lレジスタの値をデクリメントする
+     */
+    private fun decL() {
+        val result = registerL - 1u
+        flagZero = result == 0x0u
+        flagN = true
+        flagH = (registerL and 0xfu) - 1u < 0x0u
+        registerL = result.toUByte()
+    }
+
+    /**
+     * Aレジスタの値をデクリメントする
+     */
+    private fun decA() {
+        val result = registerA - 1u
+        flagZero = result == 0x0u
+        flagN = true
+        flagH = (registerA and 0xfu) - 1u < 0x0u
+        registerA = result.toUByte()
+    }
+
+    /**
+     * HLレジスタの値をデクリメントする
+     */
+    private fun decHL2() {
+        val hl = registerH * 16u + registerL
+        val value = hl - 1u
+        registerH = (value / 16u).toUByte()
+        registerL = (value % 16u).toUByte()
+        tickFourCycle()
+        tickFourCycle()
+    }
+
     // 8bit ロード命令
     /**
      * Bレジスタに入力されたレジスタの値を格納する
@@ -744,26 +833,34 @@ class Cpu(private val chipset: Chipset){
             0x02 -> this.ldBCA()
             0x03 -> this.incBC()
             0x04 -> this.incB()
+            0x05 -> this.decB()
             0x0a -> this.ldABC()
             0x0b -> this.decBC()
             0x0c -> this.incC()
+            0x0d -> this.decC()
             0x10 -> this.stop()
             0x12 -> this.ldDEA()
             0x13 -> this.incDE()
             0x14 -> this.incD()
+            0x15 -> this.decD()
             0x1a -> this.ldADE()
             0x1b -> this.decDE()
             0x1c -> this.incE()
+            0x1d -> this.decE()
             0x23 -> this.incHL()
             0x24 -> this.incH()
+            0x25 -> this.decH()
             0x2b -> this.decHL()
             0x2c -> this.incL()
+            0x2d -> this.decL()
             0x33 -> this.incSP()
             0x34 -> this.incHL2()
+            0x35 -> this.decHL2()
             0x36 -> this.ldHLN()
             0x37 -> this.scf()
             0x3b -> this.decSP()
             0x3c -> this.incA()
+            0x3d -> this.decA()
             0x3f -> this.ccf()
             0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x47 -> this.ldBr(value1)
             0x46 -> this.ldBHL()
