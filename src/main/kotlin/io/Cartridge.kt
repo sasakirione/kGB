@@ -2,6 +2,7 @@ package io
 
 import util.Const.ROM_FOLDER
 import util.Const.SAVE_FOLDER
+import util.Logger.trace
 import java.io.File
 
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -49,5 +50,22 @@ class Cartridge(romName: String): IO {
                 throw Exception("カートリッジの存在しない領域に書き込もうとしています。")
             }
         }
+    }
+
+    override fun refresh(tick: UByte) {
+        trace(tick.toString())
+    }
+
+    /**
+     * セーブデータをファイルに書き込む
+     */
+    fun writeSaveData() {
+        val ramFile = File(ramPath)
+        if (!ramFile.exists()) {
+            ramFile.createNewFile()
+        }
+        val ramStream = ramFile.outputStream()
+        ramStream.write(ram.asByteArray())
+        ramStream.close()
     }
 }

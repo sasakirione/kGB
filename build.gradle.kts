@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.8.0"
+    id("org.jetbrains.compose") version "1.3.0"
     application
 }
 
@@ -8,9 +9,11 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 dependencies {
+    implementation(compose.desktop.currentOs)
     testImplementation(kotlin("test"))
 }
 
