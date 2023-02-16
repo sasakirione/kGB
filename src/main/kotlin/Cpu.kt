@@ -36,6 +36,7 @@ class Cpu(private val chipset: Chipset){
         print("N: ${getFlagN().toString(16)}, ")
         print("H: ${getFlagH().toString(16)}, ")
         println("C: ${getFlagC().toString(16)}")
+        println("--------------------------------------------------------")
     }
 
     private fun getFlagZ(): UByte {
@@ -820,6 +821,23 @@ class Cpu(private val chipset: Chipset){
         registerPC = sourceAddress.toUShort()
     }
 
+    /**
+     * 指定されたアドレスの命令を呼び出す
+     */
+    private fun callNN() {
+        val sourceAddress1 = readMemoryFrom8BitOfInstructions()
+        val sourceAddress2 = readMemoryFrom8BitOfInstructions()
+        val sourceAddress = sourceAddress1 * 16u + sourceAddress2
+        registerSP = (registerSP - 2u).toUShort()
+        chipset.setValue(registerSP, registerPC.toUByte())
+        registerPC = sourceAddress.toUShort()
+        tickFourCycle()
+        tickFourCycle()
+        tickFourCycle()
+        tickFourCycle()
+        tickFourCycle()
+    }
+
     // 命令を振り分けるアレアレアレ
     /**
      * 命令を実行する
@@ -887,6 +905,7 @@ class Cpu(private val chipset: Chipset){
             0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa7 -> this.andAr(value1)
             0xa6 -> this.andAHL()
             0xc3 -> this.jpNN()
+            0xcd -> this.callNN()
             0xe9 -> this.jpHL()
             0xf3 -> this.di()
             0xf9 -> this.ldSPHL()
