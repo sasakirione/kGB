@@ -838,6 +838,17 @@ class Cpu(private val chipset: Chipset){
         tickFourCycle()
     }
 
+    /**
+     * 呼出先から戻る
+     */
+    private fun ret() {
+        registerPC = chipset.getValue(registerSP).toUShort()
+        registerSP = (registerSP + 2u).toUShort()
+        tickFourCycle()
+        tickFourCycle()
+        tickFourCycle()
+    }
+
     // 命令を振り分けるアレアレアレ
     /**
      * 命令を実行する
@@ -905,6 +916,7 @@ class Cpu(private val chipset: Chipset){
             0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xa5, 0xa7 -> this.andAr(value1)
             0xa6 -> this.andAHL()
             0xc3 -> this.jpNN()
+            0xc9 -> this.ret()
             0xcd -> this.callNN()
             0xe9 -> this.jpHL()
             0xf3 -> this.di()
