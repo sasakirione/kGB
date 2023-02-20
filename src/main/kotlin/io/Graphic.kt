@@ -4,7 +4,13 @@ import util.Logger
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class Graphic {
+    /**
+     * スクリーンサイズ横
+     */
     private val SCREEN_WIDTH = 160
+    /**
+     * スクリーンサイズ縦
+     */
     private val SCREEN_HEIGHT = 144
 
     /**
@@ -15,9 +21,17 @@ class Graphic {
      * OAM
      */
     private var oam: UByteArray = UByteArray(0xa0)
-
+    /**
+     * VRAMステータス(ゲームボーイだとこれで書き込みと読み出しが合致会わないようにしている)
+     */
     private var vramStatus: UByte = 0u
 
+    /**
+     * グラフィック領域から値を読み出す
+     *
+     * @param address 16bitアドレス
+     * @return アドレスに格納されている値
+     */
     fun getValue(address: UShort): UByte {
         val value = when (address) {
             in 0x8000u..0x9fffu -> {
@@ -29,7 +43,7 @@ class Graphic {
                 }
             }
             in 0xfe00u..0xfe9fu -> {
-                if (vramStatus.toInt() and 0x3 == 0x3) {
+                if (vramStatus.toInt() and 0x3 == 0x0 || vramStatus.toInt() and 0x3 == 0x1) {
                     Logger.warn("VRAMのアクセスが許可されていないタイミングです。規定値の0xffを返します。")
                     0xffu
                 } else {
@@ -45,6 +59,12 @@ class Graphic {
         return value
     }
 
+    /**
+     * グラフィック領域に値を書き込む
+     *
+     * @param address 16bitアドレス
+     * @param sourceValue 書き込む値
+     */
     fun setValue(address: UShort, sourceValue: UByte) {
         when (address) {
             in 0x8000u..0x9fffu -> vram[address.toInt() - 0x8000] = sourceValue

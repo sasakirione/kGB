@@ -917,7 +917,7 @@ class Cpu(private val chipset: Chipset){
     /**
      * 命令を実行する
      */
-    fun execInstructions() {
+    private fun execInstructions() {
         val instruction = readMemoryFrom8BitOfInstructions()
         val value1 = instruction and 7u
 
@@ -999,9 +999,5 @@ class Cpu(private val chipset: Chipset){
 
     private fun tickFourCycle() {
         tick = (tick + 4u).toUByte()
-    }
-
-    fun byOneFrame() {
-        chipset.endDisposal()
     }
 }
