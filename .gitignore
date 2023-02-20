@@ -8,5 +8,5 @@ out/
 
 rom
 save
-.idea
-gradle
+/.idea/
+/gradle/
