@@ -16,10 +16,6 @@ class Chipset(romName: String) {
      * カートリッジ
      */
     private val cartridge: Cartridge = Cartridge(romName)
-    /**
-     * グラフィック
-     */
-    private val graphic: Graphic = Graphic()
 
     /**
      * 割り込み有効化レジスタ(IE)
@@ -35,7 +31,7 @@ class Chipset(romName: String) {
     fun getValue(address: UShort): UByte {
         val value = when (address) {
             in 0x0000u..0x7fffu -> cartridge.getValue(address)
-            in 0x8000u..0x9fffu -> graphic.getValue(address)
+            in 0x8000u..0x9fffu -> Graphic.getValue(address)
             in 0xa000u..0xbfffu -> cartridge.getValue(address)
             in 0xc000u..0xdfffu -> memory[address.toInt() - 0xc000]
             in 0xff80u..0xfffeu -> highMemory[address.toInt() - 0xff80]
@@ -58,7 +54,7 @@ class Chipset(romName: String) {
     fun setValue(address: UShort, sourceValue: UByte) {
         when (address) {
             in 0x0000u..0x7fffu -> cartridge.setValue(address, sourceValue)
-            in 0x8000u..0x9fffu -> graphic.setValue(address, sourceValue)
+            in 0x8000u..0x9fffu -> Graphic.setValue(address, sourceValue)
             in 0xa000u..0xbfffu -> cartridge.setValue(address, sourceValue)
             in 0xc000u..0xdfffu -> memory[address.toInt() - 0xc000] = sourceValue
             in 0xff80u..0xfffeu -> highMemory[address.toInt() - 0xff80] = sourceValue

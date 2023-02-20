@@ -3,7 +3,7 @@ package io
 import util.Logger
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class Graphic {
+object Graphic {
     /**
      * スクリーンサイズ横
      */
