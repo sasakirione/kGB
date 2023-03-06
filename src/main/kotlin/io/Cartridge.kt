@@ -36,6 +36,12 @@ class Cartridge(romName: String) {
     }
 
 
+    /**
+     * カートリッジからアドレスの値を読み出す
+     *
+     * @param address アドレス
+     * @return アドレスに格納されている値
+     */
     fun getValue(address: UShort): UByte {
         val value = when (address) {
             in 0x0000u..0x7fffu -> rom[address.toInt()]
@@ -47,6 +53,12 @@ class Cartridge(romName: String) {
         return value
     }
 
+    /**
+     * カートリッジのアドレスに値を書き込む
+     *
+     * @param address アドレス
+     * @param sourceValue 書き込む値
+     */
     fun setValue(address: UShort, sourceValue: UByte) {
         when (address) {
             in 0x0000u..0x7fffu -> rom[address.toInt()] = sourceValue
