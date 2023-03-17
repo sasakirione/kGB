@@ -1000,4 +1000,12 @@ class Cpu(private val chipset: Chipset){
     private fun tickFourCycle() {
         tick = (tick + 4u).toUByte()
     }
+
+    fun getPixel(x: Int, y: Int): Int {
+        return 1
+    }
+
+    fun getGameTitle(): String {
+        return chipset.getCartridgeName()
+    }
 }

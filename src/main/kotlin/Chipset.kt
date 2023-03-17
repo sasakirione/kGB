@@ -72,4 +72,8 @@ class Chipset(romName: String) {
     fun endDisposal() {
         cartridge.writeSaveData()
     }
+
+    fun getCartridgeName(): String {
+        return cartridge.loadingRomName
+    }
 }
