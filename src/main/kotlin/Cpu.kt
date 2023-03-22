@@ -1,3 +1,4 @@
+import androidx.compose.ui.graphics.Color
 import util.Logger
 
 class Cpu(private val chipset: Chipset){
@@ -1001,8 +1002,8 @@ class Cpu(private val chipset: Chipset){
         tick = (tick + 4u).toUByte()
     }
 
-    fun getPixel(x: Int, y: Int): Int {
-        return 1
+    fun getPixel(x: Int, y: Int): Color {
+        return Color(0, 0, 0)
     }
 
     fun getGameTitle(): String {

@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -51,8 +50,7 @@ fun main() = application {
 fun DrawScope.renderScreen(cpu: Cpu) {
     for (y in 0 until 144) {
         for (x in 0 until 160) {
-            val pixelValue = cpu.getPixel(x, y)
-            val color = Color(pixelValue, pixelValue, pixelValue)
+            val color = cpu.getPixel(x, y)
             drawRect(color = color, topLeft = Offset(x.toFloat(), y.toFloat()), size = Size(1f, 1f))
         }
     }
