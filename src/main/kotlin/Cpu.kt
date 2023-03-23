@@ -1006,7 +1006,19 @@ class Cpu(private val chipset: Chipset){
         return Color(0, 0, 0)
     }
 
+    /**
+     * ROMデータから読み込んだゲームのタイトルを取得する
+     *
+     * @return ゲームのタイトル
+     */
     fun getGameTitle(): String {
         return chipset.getCartridgeName()
+    }
+
+    /**
+     * ゲームを外部ファイルに保存する
+     */
+    fun save() {
+        chipset.save()
     }
 }

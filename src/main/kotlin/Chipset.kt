@@ -69,11 +69,16 @@ class Chipset(romName: String) {
         }
     }
 
-    fun endDisposal() {
-        cartridge.writeSaveData()
-    }
-
+    /**
+     * カートリッジの名前を取得する
+     *
+     * @return カートリッジの名前
+     */
     fun getCartridgeName(): String {
         return cartridge.loadingRomName
+    }
+
+    fun save() {
+        cartridge.writeSaveData()
     }
 }
