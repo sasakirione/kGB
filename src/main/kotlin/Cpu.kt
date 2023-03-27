@@ -2,14 +2,41 @@ import androidx.compose.ui.graphics.Color
 import util.Logger
 
 class Cpu(private val chipset: Chipset){
+    /**
+     * Aレジスタ
+     */
     private var registerA: UByte = 0x00u
+    /**
+     * Bレジスタ
+     */
     private var registerB: UByte = 0x00u
+    /**
+     * Cレジスタ
+     */
     private var registerC: UByte = 0x00u
+    /**
+     * Dレジスタ
+     */
     private var registerD: UByte = 0x00u
+    /**
+     * Eレジスタ
+     */
     private var registerE: UByte = 0x00u
+    /**
+     * Hレジスタ
+     */
     private var registerH: UByte = 0x00u
+    /**
+     * Lレジスタ
+     */
     private var registerL: UByte = 0x00u
+    /**
+     * スタックポインタ
+     */
     private var registerSP: UShort = 0x0000u
+    /**
+     * プログラムカウンタ
+     */
     private var registerPC: UShort = 0x0100u
 
     private var tick: UByte = 0x00u

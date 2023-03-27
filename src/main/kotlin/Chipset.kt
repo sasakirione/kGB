@@ -1,5 +1,6 @@
 import io.Cartridge
 import io.Graphic
+import util.Logger.error
 import util.Logger.warn
 
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -16,11 +17,37 @@ class Chipset(romName: String) {
      * カートリッジ
      */
     private val cartridge: Cartridge = Cartridge(romName)
+    /**
+     * 内部ロゴデータのUByteArray
+     */
+    private val innerLogoData = ubyteArrayOf(0xCEu,0xEDu,0x66u,0x66u,0xCCu,0x0Du,0x00u,0x0Bu,0x03u,0x73u,0x00u,0x83u,0x00u,0x0Cu,0x00u,0x0Du,0x00u,0x08u,0x11u,0x1Fu,0x88u,0x89u,0x00u,0x0Eu,0xDCu,0xCCu,0x6Eu,0xE6u,0xDDu,0xDDu,0xD9u,0x99u,0xBBu,0xBBu,0x67u,0x63u,0x6Eu,0x0Eu,0xECu,0xCCu,0xDDu,0xDCu,0x99u,0x9Fu,0xBBu,0xB9u,0x33u)
 
     /**
      * 割り込み有効化レジスタ(IE)
      */
     private var interruptEnableRegister: UByte = 0u
+
+    init {
+        // カートリッジの $0104 から $0133 に配置されている任天堂ロゴデータを取得する
+        val logoData = cartridge.getLogoData()
+        // $0104 から $0133 のロゴ画像のデータを、内部 ROM のデータの内容と比較する
+        logoData.forEachIndexed { index, value ->
+            if (value != innerLogoData[index]) {
+                error("カートリッジの任天堂ロゴが不正です")
+                throw Exception("カートリッジの任天堂ロゴが不正です")
+            }
+        }
+        // カートリッジの$0134から$014Dのそれぞれのバイトを足し合わせ、さらに合計値に対して10 進数で 25 を足す
+        var sum = 0
+        for (i in 0x0134..0x014D) {
+            sum = (cartridge.getValue(i.toUShort()) + sum.toUInt()).toInt()
+        }
+        sum += 25
+        if ((sum.toUByte() and 1u) != 0u.toUByte()) {
+            error("チェックサムが一致しません。${sum.toUByte() and 1u}")
+            throw Exception("チェックサムが一致しません")
+        }
+    }
 
     /**
      * 16bitアドレスから値を読み出す

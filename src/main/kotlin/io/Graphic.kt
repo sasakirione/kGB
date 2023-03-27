@@ -7,11 +7,11 @@ object Graphic {
     /**
      * スクリーンサイズ横
      */
-    val SCREEN_WIDTH = 160
+    private const val SCREEN_WIDTH = 160
     /**
      * スクリーンサイズ縦
      */
-    val SCREEN_HEIGHT = 144
+    private const val SCREEN_HEIGHT = 144
 
     /**
      * VRAM
@@ -137,8 +137,7 @@ object Graphic {
                 }
             }
         }
-
-
     }
+
 
 }

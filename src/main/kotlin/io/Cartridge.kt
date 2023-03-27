@@ -81,4 +81,8 @@ class Cartridge(romName: String) {
         ramStream.write(ram.asByteArray())
         ramStream.close()
     }
+
+    fun getLogoData(): UByteArray {
+        return rom.copyOfRange(0x104, 0x133)
+    }
 }
